@@ -31,7 +31,7 @@ else:
         "Place": [place]
     })
 
-    # One-hot encode place like training data
+    # cOne-hot encode place like training data
     input_df_encoded = pd.get_dummies(input_df, columns=["Place"], prefix="Place")
 
     # Add missing columns (set to 0) to match training
