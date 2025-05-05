@@ -20,29 +20,33 @@ st.write("Enter the details below to predict the house price (in Crores).")
 area = st.number_input("📏 Area (in cents)", min_value=0.0, value=0.0, step=0.1)
 place = st.selectbox("📍 Place", options=place_options)
 
-# Build user input into DataFrame
-input_df = pd.DataFrame({
-    "Area (in cents)": [area],
-    "Place": [place]
-})
+# Handle case when area is 0
+if area == 0:
+    st.warning("Area is 0. Prediction might not be meaningful.")
+    st.success("💰 Estimated Price: ₹ 0.00 Cr")
+else:
+    # Build user input into DataFrame
+    input_df = pd.DataFrame({
+        "Area (in cents)": [area],
+        "Place": [place]
+    })
 
-# One-hot encode place like training data
-input_df_encoded = pd.get_dummies(input_df, columns=["Place"], prefix="Place")
+    # One-hot encode place like training data
+    input_df_encoded = pd.get_dummies(input_df, columns=["Place"], prefix="Place")
 
-# Add missing columns (set to 0) to match training
-for col in model_columns:
-    if col not in input_df_encoded.columns:
-        input_df_encoded[col] = 0
+    # Add missing columns (set to 0) to match training
+    for col in model_columns:
+        if col not in input_df_encoded.columns:
+            input_df_encoded[col] = 0
 
-# Reorder columns to match training
-input_df_encoded = input_df_encoded[model_columns]
+    # Reorder columns to match training
+    input_df_encoded = input_df_encoded[model_columns]
 
-# Apply preprocessing pipeline
-input_prepared = preprocessing_pipeline.transform(input_df_encoded)
+    # Apply preprocessing pipeline
+    input_prepared = preprocessing_pipeline.transform(input_df_encoded)
 
-# Make prediction
-prediction = best_model.predict(input_prepared)[0]
+    # Make prediction
+    prediction = best_model.predict(input_prepared)[0]
 
-# Display result
-st.success(f"💰 Estimated Price: ₹ {prediction:.2f} Cr")
-
+    # Display result
+    st.success(f"💰 Estimated Price: ₹ {prediction:.2f} Cr")
